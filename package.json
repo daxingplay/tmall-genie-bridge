@@ -1,0 +1,23 @@
+{
+  "name": "tmall-genie-bridge",
+  "version": "1.0.0",
+  "description": "Home Assistant Bridge for Tmall Genie",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daxingplay/tmall-genie-bridge.git"
+  },
+  "author": "daxingplay <daxingplay@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daxingplay/tmall-genie-bridge/issues"
+  },
+  "homepage": "https://github.com/daxingplay/tmall-genie-bridge#readme",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "fastify": "^0.35.1"
+  }
+}
