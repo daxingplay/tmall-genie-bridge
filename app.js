@@ -3,7 +3,9 @@
  * author: daxingplay <daxingplay@gmail.com>
  */
 
-const fastify = require('fastify')();
+const fastify = require('fastify')({
+  logger: !!process.env.DEBUG,
+});
 const helmet = require('fastify-helmet');
 
 fastify.register(helmet);
