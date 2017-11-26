@@ -14,7 +14,7 @@ const replyWords = {
 
 const generateReplyWords = (intent, entityName) => {
   const words = replyWords[intent] || ['好的'];
-  return words[_.random(words.length)].replace('@{device_name}', entityName);
+  return words[_.random(words.length - 1)].replace('@{device_name}', entityName);
 };
 
 const generateTmallGenieCustomResponse = (reply, haResponse, intent, entityName) => {
