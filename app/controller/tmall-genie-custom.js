@@ -26,11 +26,13 @@ const generateTmallGenieCustomResponse = (reply, haResponse, intent, entityName)
     returnValue: {
       reply: '',
       resultType: 'RESULT',
+      executeCode: "ERROR",
     },
   };
   if (success === true) {
     response.code = '0';
     response.returnValue.reply = generateReplyWords(intent, entityName);
+    response.returnValue.executeCode = 'SUCCESS';
   } else if (code === 404) {
     response.returnValue.reply = `没有找到${entityName}`;
   } else if (code === 403) {
