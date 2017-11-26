@@ -4,7 +4,9 @@
  */
 
 const fastify = require('fastify')();
+const helmet = require('fastify-helmet');
 
+fastify.register(helmet);
 fastify.register(require('./app/ha-bridge'), {
   haPassword: process.env.HA_PASSWORD,
   haUrl: process.env.HA_URL,
