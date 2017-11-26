@@ -11,7 +11,9 @@ fastify.register(require('./app/ha-bridge'), {
   haPassword: process.env.HA_PASSWORD,
   haUrl: process.env.HA_URL,
 });
-fastify.register(require('./app/routes'));
+fastify.register(require('./app/routes'), {
+  serverPassword: process.env.PASSWORD,
+});
 
 // Run the server!
 fastify.listen(3000, function (err) {

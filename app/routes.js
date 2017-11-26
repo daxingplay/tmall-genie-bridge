@@ -13,7 +13,7 @@ async function routes(fastify, options) {
   });
 
   // const opt = { schema: tmallGenieStandardWebHook };
-  fastify.post('/api/tmall-genie/custom', tmallGenieCustom(fastify));
+  fastify.post('/api/tmall-genie/custom', tmallGenieCustom(fastify, options));
 
 }
 

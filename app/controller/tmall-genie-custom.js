@@ -44,17 +44,21 @@ const generateTmallGenieCustomResponse = (reply, haResponse, intent, entityName)
     .send(response);
 };
 
-const tmallGenieCustom = (fastify) => {
+const tmallGenieCustom = (fastify, options) => {
   return async (request, reply) => {
-    let ret = { success: false, code: 500 };
-    const { intentName, slotEntities } = request.body;
-    const entityNames = getEntityNames(slotEntities);
-    if (fastify.ha.allowedIntents.indexOf(intentName) > -1) {
-      try {
-        ret = await fastify.ha.exec(intentName, entityNames[0]);
-      } catch (e) {}
+    if (options.serverPassword && request.headers.password === options.serverPassword) {
+      let ret = { success: false, code: 500 };
+      const { intentName, slotEntities } = request.body;
+      const entityNames = getEntityNames(slotEntities);
+      if (fastify.ha.allowedIntents.indexOf(intentName) > -1) {
+        try {
+          ret = await fastify.ha.exec(intentName, entityNames[0]);
+        } catch (e) {}
+      }
+      generateTmallGenieCustomResponse(reply, ret, intentName, entityNames[0]);
+    } else {
+      reply.code(404); // do not let others know we have this route though 403 is more meaningful.
     }
-    generateTmallGenieCustomResponse(reply, ret, intentName, entityNames[0]);
   };
 };
 
