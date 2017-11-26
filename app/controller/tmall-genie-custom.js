@@ -30,7 +30,7 @@ const generateTmallGenieCustomResponse = (reply, haResponse, intent, entityName)
     },
   };
   if (success === true) {
-    response.code = '0';
+    response.returnCode = '0';
     response.returnValue.reply = generateReplyWords(intent, entityName);
     response.returnValue.executeCode = 'SUCCESS';
   } else if (code === 404) {
