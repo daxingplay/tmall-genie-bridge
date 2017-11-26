@@ -18,6 +18,9 @@
   "homepage": "https://github.com/daxingplay/tmall-genie-bridge#readme",
   "dependencies": {
     "axios": "^0.17.1",
-    "fastify": "^0.35.1"
+    "fastify": "^0.35.1",
+    "fastify-helmet": "^1.0.2",
+    "fastify-plugin": "^0.1.1",
+    "lodash": "^4.17.4"
   }
 }

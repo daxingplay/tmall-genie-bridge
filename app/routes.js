@@ -3,7 +3,8 @@
  * author: daxingplay <daxingplay@gmail.com>
  */
 
-import { tmallGenieStandardWebHook } from "./schema/tmall-genie";
+// import { tmallGenieStandardWebHook } from "./schema/tmall-genie";
+const tmallGenieCustom = require('./controller/tmall-genie-custom');
 
 async function routes(fastify, options) {
 
@@ -12,7 +13,7 @@ async function routes(fastify, options) {
   });
 
   // const opt = { schema: tmallGenieStandardWebHook };
-  fastify.post('/api/tmall-genie', async (request, reply) => {});
+  fastify.post('/api/tmall-genie/custom', tmallGenieCustom(fastify));
 
 }
 

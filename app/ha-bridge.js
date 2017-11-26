@@ -3,10 +3,13 @@
  * author: daxingplay <daxingplay@gmail.com>
  */
 
+const fp = require('fastify-plugin');
 const HA = require('./lib/home-assistant');
 
 async function haBridge(fastify, options) {
-  fastify.decorate('ha', new HA(options));
+  const homeAssistant = new HA(options);
+  const inst = await homeAssistant.connect();
+  fastify.decorate('ha', inst);
 }
 
-module.exports = haBridge;
+module.exports = fp(haBridge);
