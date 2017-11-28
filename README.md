@@ -1,2 +1,3 @@
 # tmall-genie-bridge
-Home Assistant Bridge for Tmall Genie
+Home Assistant (HA) Bridge for Tmall Genie (天猫精灵)
+
