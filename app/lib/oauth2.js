@@ -46,14 +46,14 @@ const dump = function() {
  * Methods used by all grant types.
  */
 
-const getAccessToken = function(bearerToken, callback) {
+const getAccessToken = function(bearerToken) {
 
   const tokens = config.tokens.filter(function(token) {
 
     return token.accessToken === bearerToken;
   });
 
-  return callback(false, tokens[0]);
+  return tokens[0];
 };
 
 const getClient = function(clientId, clientSecret, callback) {
