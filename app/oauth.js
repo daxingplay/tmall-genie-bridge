@@ -11,11 +11,9 @@ function oauth2(fastify, options) {
   const model = oauthModel.generateModel(options);
   fastify.decorate('oauth', oauth2server({
     model,
-    grants: ['password', 'client_credentials'],
-    debug: true
   }));
 
-  fastify.all('/oauth/token', fastify.oauth.grant());
+  fastify.all('/oauth/token', fastify.oauth.token());
 
 }
 
