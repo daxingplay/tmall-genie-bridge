@@ -15,6 +15,10 @@ async function routes(fastify, options) {
   // const opt = { schema: tmallGenieStandardWebHook };
   fastify.post('/api/tmall-genie/custom', tmallGenieCustom(fastify, options));
 
+  fastify.post('/api/tmall-genie/standard', fastify.oauth.authorise(), function (request, reply) {
+    reply.send('Congratulations, you are in a secret area!');
+  });
+
 }
 
 module.exports = routes;

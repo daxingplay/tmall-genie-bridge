@@ -21,6 +21,7 @@
     "fastify": "^0.35.1",
     "fastify-helmet": "^1.0.2",
     "fastify-plugin": "^0.1.1",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "oauth2-server": "^3.0.0"
   }
 }
