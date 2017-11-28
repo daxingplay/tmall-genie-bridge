@@ -11,13 +11,17 @@ const config = {
   clients: [
     {
       clientId: 'application',
-      clientSecret: 'secret'
+      clientSecret: 'secret',
+      redirectUris: [],
+      grants: ['client_credentials', 'password'],
     }
   ],
   confidentialClients: [
     {
       clientId: 'confidentialApplication',
-      clientSecret: 'topSecret'
+      clientSecret: 'topSecret',
+      redirectUris: [],
+      grants: ['client_credentials', 'password'],
     }
   ],
   tokens: [],
@@ -56,7 +60,7 @@ const getAccessToken = function(bearerToken) {
   return tokens[0];
 };
 
-const getClient = function(clientId, clientSecret, callback) {
+const getClient = function(clientId, clientSecret) {
 
   const clients = config.clients.filter(function(client) {
 
@@ -68,28 +72,7 @@ const getClient = function(clientId, clientSecret, callback) {
     return client.clientId === clientId && client.clientSecret === clientSecret;
   });
 
-  callback(false, clients[0] || confidentialClients[0]);
-};
-
-const grantTypeAllowed = function(clientId, grantType, callback) {
-
-  let clientsSource;
-  let clients = [];
-
-  if (grantType === 'password') {
-    clientsSource = config.clients;
-  } else if (grantType === 'client_credentials') {
-    clientsSource = config.confidentialClients;
-  }
-
-  if (!!clientsSource) {
-    clients = clientsSource.filter(function(client) {
-
-      return client.clientId === clientId;
-    });
-  }
-
-  callback(false, clients.length);
+  return clients[0] || confidentialClients[0];
 };
 
 const saveToken = function(token, client, user) {
@@ -153,7 +136,6 @@ exports.generateModel = (options) => {
   return {
     getAccessToken,
     getClient,
-    grantTypeAllowed,
     saveToken,
     getUser,
     getUserFromClient,
