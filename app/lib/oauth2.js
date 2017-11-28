@@ -92,16 +92,21 @@ const grantTypeAllowed = function(clientId, grantType, callback) {
   callback(false, clients.length);
 };
 
-const saveAccessToken = function(accessToken, clientId, expires, user, callback) {
+const saveToken = function(token, client, user) {
 
-  config.tokens.push({
-    accessToken: accessToken,
-    expires: expires,
-    clientId: clientId,
-    user: user
-  });
+  const ret = {
+    accessToken: token.accessToken,
+    accessTokenExpiresAt: token.accessTokenExpiresAt,
+    refreshToken: token.refreshToken,
+    refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+    scope: token.scope,
+    client: { id: client.id },
+    user: { id: user.id },
+  };
 
-  callback(false);
+  config.tokens.push(ret);
+
+  return ret;
 };
 
 /*
@@ -149,7 +154,7 @@ exports.generateModel = (options) => {
     getAccessToken,
     getClient,
     grantTypeAllowed,
-    saveAccessToken,
+    saveToken,
     getUser,
     getUserFromClient,
   };
