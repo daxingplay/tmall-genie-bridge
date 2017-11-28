@@ -96,36 +96,37 @@ const saveToken = function(token, client, user) {
  * Method used only by password grant type.
  */
 
-const getUser = function(username, password, callback) {
+const getUser = function(username, password) {
 
   const users = config.users.filter(function(user) {
 
     return user.username === username && user.password === password;
   });
 
-  callback(false, users[0]);
+  return users[0];
 };
 
 /*
  * Method used only by client_credentials grant type.
  */
 
-const getUserFromClient = function(clientId, clientSecret, callback) {
+const getUserFromClient = function(client) {
 
-  const clients = config.confidentialClients.filter(function(client) {
+  // FIXME
+  const clients = config.confidentialClients.filter(function(c) {
 
-    return client.clientId === clientId && client.clientSecret === clientSecret;
+    return c.clientId === client.id;
   });
 
   let user;
 
   if (clients.length) {
     user = {
-      username: clientId
+      username: client.id,
     };
   }
 
-  callback(false, user);
+  return user;
 };
 
 /**
