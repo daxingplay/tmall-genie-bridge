@@ -12,8 +12,8 @@ const config = {
     {
       clientId: 'application',
       clientSecret: 'secret',
-      redirectUris: [],
-      grants: ['client_credentials', 'password'],
+      redirectUris: ['https://developers.google.com/oauthplayground'],
+      grants: ['client_credentials', 'password', 'authorization_code'],
     }
   ],
   confidentialClients: [
@@ -21,17 +21,18 @@ const config = {
       clientId: 'confidentialApplication',
       clientSecret: 'topSecret',
       redirectUris: [],
-      grants: ['client_credentials', 'password'],
+      grants: ['client_credentials', 'password', 'authorization_code'],
     }
   ],
   tokens: [],
   users: [
     {
       id: '123',
-      username: 'pedroetb',
-      password: 'password'
+      username: 'daxingplay',
+      password: '123'
     }
-  ]
+  ],
+  authorizationCodes: [],
 };
 
 /**
@@ -63,8 +64,11 @@ const getAccessToken = function(bearerToken) {
 const getClient = function(clientId, clientSecret) {
 
   const clients = config.clients.filter(function(client) {
-
-    return client.clientId === clientId && client.clientSecret === clientSecret;
+    let checkSecret = true;
+    if (clientSecret !== null) {
+      checkSecret = client.clientSecret === clientSecret;
+    }
+    return client.clientId === clientId && checkSecret;
   });
 
   const confidentialClients = config.confidentialClients.filter(function(client) {
@@ -129,6 +133,19 @@ const getUserFromClient = function(client) {
   return user;
 };
 
+const saveAuthorizationCode = function (code, client, user) {
+  const ret = {
+    expiresAt: code.expires_at,
+    redirectUri: code.redirect_uri,
+    scope: code.scope,
+    client: {id: client.id },
+    user: {id: user.id },
+  };
+  config.authorizationCodes.push(ret);
+
+  return ret;
+};
+
 /**
  * Export model definition object.
  */
@@ -140,5 +157,6 @@ exports.generateModel = (options) => {
     saveToken,
     getUser,
     getUserFromClient,
+    saveAuthorizationCode,
   };
 };

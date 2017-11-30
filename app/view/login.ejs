@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<form enctype="application/x-www-form-urlencoded" method="post" action="<%= url %>">
+  <label for="J_Username">Username</label>
+  <input id="J_Username" name="username" type="text" />
+
+  <label for="J_Password">Password</label>
+  <input id="J_Password" name="password" type="password" />
+
+  <button type="submit">Submit</button>
+
+  <input type="hidden" name="token" value="<%= token %>" />
+</form>
+</body>
+</html>
