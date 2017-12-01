@@ -8,7 +8,7 @@ const fastify = require('fastify')({
   logger: !!process.env.DEBUG,
 });
 const helmet = require('fastify-helmet');
-const config = require('./config');
+const config = require('./config/index');
 
 fastify.register(helmet);
 fastify.register(require('point-of-view'), {
