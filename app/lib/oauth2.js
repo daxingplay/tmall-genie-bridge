@@ -10,23 +10,10 @@ const _ = require('lodash');
  */
 
 const config = {
-  clients: [
-    {
-      clientId: 'application',
-      clientSecret: 'secret',
-      redirectUris: ['https://developers.google.com/oauthplayground'],
-      grants: ['authorization_code'],
-    }
-  ],
+  clients: [],
   confidentialClients: [],
   tokens: [],
-  users: [
-    {
-      id: '123',
-      username: 'daxingplay',
-      password: '123'
-    }
-  ],
+  users: [],
   authorizationCodes: [],
 };
 
@@ -160,6 +147,12 @@ const revokeAuthorizationCode = function (code) {
  */
 
 exports.generateModel = (options) => {
+  if (Array.isArray(options.clients)) {
+    config.clients = options.clients;
+  }
+  if (Array.isArray(options.users)) {
+    config.users = options.users;
+  }
   return {
     getAccessToken,
     getClient,

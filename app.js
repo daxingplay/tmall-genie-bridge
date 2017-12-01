@@ -8,6 +8,7 @@ const fastify = require('fastify')({
   logger: !!process.env.DEBUG,
 });
 const helmet = require('fastify-helmet');
+const config = require('./config');
 
 fastify.register(helmet);
 fastify.register(require('point-of-view'), {
@@ -18,12 +19,15 @@ fastify.register(require('point-of-view'), {
 });
 fastify.register(require('fastify-formbody'));
 fastify.register(require('./app/ha-bridge'), {
-  haPassword: process.env.HA_PASSWORD,
-  haUrl: process.env.HA_URL,
+  haPassword: config.ha.password,
+  haUrl: config.ha.url,
 });
-fastify.register(require('./app/oauth'));
+fastify.register(require('./app/oauth'), {
+  clients: config.oauth2.clients,
+  users: config.oauth2.users,
+});
 fastify.register(require('./app/routes'), {
-  serverPassword: process.env.PASSWORD,
+  serverPassword: config.serverPassword,
 });
 
 // Run the server!
