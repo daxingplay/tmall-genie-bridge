@@ -14,7 +14,7 @@ module.exports = {
       {
         clientId: 'application',
         clientSecret: 'secret',
-        redirectUris: ['https://developers.google.com/oauthplayground'],
+        redirectUris: ['https://open.bot.tmall.com/oauth/callback'],
         grants: ['authorization_code'],
       }
     ],
