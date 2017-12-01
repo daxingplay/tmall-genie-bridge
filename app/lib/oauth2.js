@@ -3,6 +3,8 @@
  * author: daxingplay <daxingplay@gmail.com>
  */
 
+const _ = require('lodash');
+
 /**
  * Configuration.
  */
@@ -13,17 +15,10 @@ const config = {
       clientId: 'application',
       clientSecret: 'secret',
       redirectUris: ['https://developers.google.com/oauthplayground'],
-      grants: ['client_credentials', 'password', 'authorization_code'],
+      grants: ['authorization_code'],
     }
   ],
-  confidentialClients: [
-    {
-      clientId: 'confidentialApplication',
-      clientSecret: 'topSecret',
-      redirectUris: [],
-      grants: ['client_credentials', 'password', 'authorization_code'],
-    }
-  ],
+  confidentialClients: [],
   tokens: [],
   users: [
     {
@@ -76,7 +71,11 @@ const getClient = function(clientId, clientSecret) {
     return client.clientId === clientId && client.clientSecret === clientSecret;
   });
 
-  return clients[0] || confidentialClients[0];
+  const ret = clients[0] || confidentialClients[0];
+  if (ret) {
+    return _.assign({ id: ret.clientId }, ret);
+  }
+  return false;
 };
 
 const saveToken = function(token, client, user) {
@@ -134,16 +133,26 @@ const getUserFromClient = function(client) {
 };
 
 const saveAuthorizationCode = function (code, client, user) {
-  const ret = {
-    expiresAt: code.expires_at,
-    redirectUri: code.redirect_uri,
-    scope: code.scope,
-    client: {id: client.id },
-    user: {id: user.id },
-  };
+  const ret = _.assign({
+    client: { id: client.clientId },
+    user: { id: user.id },
+  }, code);
   config.authorizationCodes.push(ret);
 
   return ret;
+};
+
+const getAuthorizationCode = function (authorizationCode) {
+  return config.authorizationCodes.filter(o => o.authorizationCode === authorizationCode)[0];
+};
+
+const revokeAuthorizationCode = function (code) {
+  const exist = getAuthorizationCode(code.authorizationCode);
+  if (exist) {
+    config.authorizationCodes = config.authorizationCodes.filter(o => o.authorizationCode !== code.authorizationCode);
+    return true;
+  }
+  return false;
 };
 
 /**
@@ -158,5 +167,7 @@ exports.generateModel = (options) => {
     getUser,
     getUserFromClient,
     saveAuthorizationCode,
+    getAuthorizationCode,
+    revokeAuthorizationCode,
   };
 };
