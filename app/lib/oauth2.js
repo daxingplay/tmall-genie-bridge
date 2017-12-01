@@ -148,7 +148,9 @@ const revokeAuthorizationCode = function (code) {
 
 exports.generateModel = (options) => {
   if (Array.isArray(options.clients)) {
-    config.clients = options.clients;
+    config.clients = options.clients.map(o => _.assign({}, o, {
+      grants: ['authorization_code'],
+    }));
   }
   if (Array.isArray(options.users)) {
     config.users = options.users;

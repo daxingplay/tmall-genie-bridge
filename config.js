@@ -15,7 +15,6 @@ module.exports = {
         clientId: 'application',
         clientSecret: 'secret',
         redirectUris: ['https://open.bot.tmall.com/oauth/callback'],
-        grants: ['authorization_code'],
       }
     ],
     users: [
