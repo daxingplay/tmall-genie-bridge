@@ -25,6 +25,7 @@ fastify.register(require('./app/ha-bridge'), {
 fastify.register(require('./app/oauth'), {
   clients: config.oauth2.clients,
   users: config.oauth2.users,
+  accessTokenLifetime: config.oauth2.accessTokenLifetime,
 });
 fastify.register(require('./app/routes'), {
   serverPassword: config.serverPassword,

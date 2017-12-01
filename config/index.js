@@ -10,6 +10,7 @@ module.exports = {
   },
   serverPassword: process.env.PASSWORD,
   oauth2: {
+    accessTokenLifetime: 3 * 24 * 60 * 60,
     clients: [
       {
         clientId: 'application',

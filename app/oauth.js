@@ -13,6 +13,7 @@ async function oauth2(fastify, options) {
   const model = oauthModel.generateModel(options);
   const server = new OAuth2Server({
     model,
+    accessTokenLifetime: options.accessTokenLifetime || 3 * 24 * 60 * 60,
   });
   fastify.decorate('oauth', server);
 
