@@ -10,4 +10,6 @@ RUN set -ex && \
 
 EXPOSE 3000
 
+VOLUME ["/srv/config"]
+
 CMD ["node", "/srv/app.js"]
