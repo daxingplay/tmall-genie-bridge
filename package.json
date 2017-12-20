@@ -26,5 +26,10 @@
     "lodash": "^4.17.4",
     "oauth2-server": "^3.0.0",
     "point-of-view": "^0.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.13.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
   }
 }

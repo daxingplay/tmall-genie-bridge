@@ -3,13 +3,17 @@
  * author: daxingplay <daxingplay@gmail.com>
  */
 
+'use strict';
+
 const _ = require('lodash');
 const assert = require('assert');
-const tmallGenieDeviceTypeMap = require('../constants/tmall-genie-device-type-map');
+const Entity = require('../accessories/index');
+const TmallGenieError = require('./tmall-genie-error');
 
 class TmallGenie {
   constructor(fastify) {
     this.fastify = fastify;
+    this.devices = {};
   }
   wrapResponse(ret, headers) {
     return {
@@ -19,12 +23,17 @@ class TmallGenie {
       payload: ret,
     };
   }
-  getDeviceName({ friendly_name, haaska_name, tmall_genie_name }) {
-    return tmall_genie_name || haaska_name || friendly_name;
-  }
-  convertDeviceType(entityId) {
-    const curType = entityId.split('.')[0];
-    return tmallGenieDeviceTypeMap[curType];
+  wrapErrorResponse(err, headers, payload) {
+    return {
+      header: _.assign({}, headers, {
+        name: 'ErrorResponse',
+      }),
+      payload: _.omitBy({
+        deviceId: payload.deviceId,
+        errorCode: err.type || 'SERVICE_ERROR',
+        message: err.message,
+      }, _.isUndefined),
+    };
   }
   async invoke(headers, payload) {
     const { namespace } = headers;
@@ -34,39 +43,44 @@ class TmallGenie {
     const func = this[`invoke${action}`];
     assert(func, `this action: ${action} currently not supported.`);
 
-    const ret = await func(headers, payload);
-    return this.wrapResponse(ret, headers);
+    try {
+      const ret = await func.call(this, headers, payload);
+      return this.wrapResponse(ret, headers);
+    } catch (e) {
+      const err = new TmallGenieError(e.message, { headers, payload });
+      return this.wrapErrorResponse(err, headers, payload);
+    }
   }
-  async invokeDiscovery(headers, payload) {
+  async invokeDiscovery() {
     const devices = await this.fastify.ha.discover();
+    this.devices = devices
+      .reduce((all, device) => {
+        const entity = new Entity(device, this.fastify.ha);
+        if (entity.inst) {
+          return _.assign(all, {
+            [entity.id]: entity,
+          });
+        }
+        return all;
+      }, {});
     return {
-      devices: devices
-        .filter(o => !!o)
-        .map(({ attributes, entity_id }) => ({
-          "deviceId": entity_id,
-          "deviceName": this.getDeviceName(attributes),
-          "deviceType": this.convertDeviceType(entity_id),
-          "zone": "", // optional
-          "brand": "HA",
-          "model": "HA",
-          "icon":"http://git.cn-hangzhou.oss-cdn.aliyun-inc.com/uploads/aicloud/aicloud-proxy-service/41baa00903a71c97e3533cf4e19a88bb/image.png",
-          "properties":[{
-            "name":"color",
-            "value":"Red"
-          }],
-          "actions":[
-            "TurnOn",
-            "TurnOff",
-            "SetBrightness",
-            "AdjustBrightness",
-            "SetTemperature",
-            "Query"          //  查询的也请返回
-          ],
-          // "extensions":{
-          //   "extension1":"",
-          //   "extension2":""
-          // },
-        })),
+      devices: _.reduce(this.devices, (arr, entity) => {
+        arr.push(entity.generateTmallBotDeviceInfo());
+        return arr;
+      }, []),
+    };
+  }
+  async invokeControl(headers, payload) {
+    const action = headers.name;
+    const entityId = payload.deviceId;
+
+    const entity = this.devices[entityId];
+    assert(entity, 'DEVICE_IS_NOT_EXIST');
+
+    const args = _.pick(payload, ['attribute', 'value', 'extensions']);
+    const ret = await entity.invoke(action, args);
+    return {
+      deviceId: entityId
     };
   }
 }

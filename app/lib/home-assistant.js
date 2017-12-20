@@ -61,6 +61,7 @@ class HomeAssistant {
   }
   async discover() {
     this.states = await this.invoke('/api/states', 'get');
+    return this.states;
   }
   async exec(intent, entityName) {
     const { domain, service, params } = intentsConfig[intent];

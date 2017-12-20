@@ -56,14 +56,12 @@ async function oauth2(fastify, options) {
     }
   });
 
-  fastify.all('/api/tmall-genie/standard', function (request, reply) {
-    const { req: { method }, query, headers, body } = request;
-    const req = new OAuth2Server.Request({
-      method, query, body, headers,
-    });
-    const res = new OAuth2Server.Response();
-    fastify.oauth.authenticate(req, res);
-    reply.send('Congratulations, you are in a secret area!');
+  fastify.use('/api/tmall-genie/standard', async function (req, res, next) {
+    // const { req: { method }, query, headers, body } = request;
+    const request = new OAuth2Server.Request(req);
+    const response = new OAuth2Server.Response();
+    const ret = await fastify.oauth.authenticate(request, response);
+    next();
   });
 
 }

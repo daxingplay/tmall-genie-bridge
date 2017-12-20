@@ -26,7 +26,7 @@ const generateTmallGenieCustomResponse = (reply, haResponse, intent, entityName)
     returnValue: {
       reply: '',
       resultType: 'RESULT',
-      executeCode: "ERROR",
+      executeCode: 'ERROR',
     },
   };
   if (success === true) {

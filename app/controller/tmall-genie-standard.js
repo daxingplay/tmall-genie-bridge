@@ -4,15 +4,20 @@
  */
 
 const assert = require('assert');
+const TmallGenie = require('../lib/tmall-genie');
 
-async function tmallGenieStandard(request, reply, fastify) {
-  const { headers: { namespace } } = request;
+const tmallGenieStandard = (fastify, options) => {
+  return async (request, reply) => {
+    const tmallGenie = new TmallGenie(fastify);
+    const { header, payload } = request.body;
 
-  assert(namespace.indexOf('AliGenie.Iot.Device.') === 0, 'not valid ali genie protocol');
+    assert(header, 'header not exists');
+    assert(payload, 'payload not exists');
 
-  switch (namespace.replace('AliGenie.Iot.Device.', '')) {
-    case 'Discovery':
-  }
-}
+    const ret = await tmallGenie.invoke(header, payload);
+    reply.code(200).send(ret);
+  };
+};
+
 
 module.exports = tmallGenieStandard;
