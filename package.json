@@ -18,6 +18,7 @@
   "homepage": "https://github.com/daxingplay/tmall-genie-bridge#readme",
   "dependencies": {
     "axios": "^0.17.1",
+    "debug": "^3.1.0",
     "ejs": "^2.5.7",
     "fastify": "^0.35.1",
     "fastify-formbody": "^1.0.1",

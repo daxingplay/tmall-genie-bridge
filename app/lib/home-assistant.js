@@ -71,13 +71,19 @@ class HomeAssistant {
         ...o,
         [param]: entity[param]
       }), {});
-      const data = await this.invoke(`/api/services/${domain}/${service}`, 'post', payload);
+      const data = await this.callService(domain, service, payload);
       if (data) {
         return { success: true, code: 200 };
       }
       return { success: false, code: 500, msg: `exec ${intent} on ${entityName} error` };
     }
     return { success: false, code: 404, msg: `${entityName} not found` };
+  }
+  async callService(domain, service, payload) {
+    return this.invoke(`/api/services/${domain}/${service}`, 'post', payload);
+  }
+  async fetchState(entityId) {
+    return this.invoke(`/states/${entityId}`);
   }
 }
 

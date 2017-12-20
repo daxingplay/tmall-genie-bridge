@@ -1,13 +1,12 @@
 'use strict';
 
+const debug = require('debug')('ha:entity:fan');
 const HomeAssistantBase = require('./base');
 
 class HomeAssistantFan extends HomeAssistantBase {
-  constructor(data) {
-    super(data);
+  constructor(data, ha) {
+    super(data, ha);
     this.domain = 'fan';
-    this.data = data;
-    this.entity_id = data.entity_id;
     this.uuid_base = data.entity_id;
     if (data.attributes && data.attributes.friendly_name) {
       this.name = data.attributes.friendly_name;
@@ -29,8 +28,6 @@ class HomeAssistantFan extends HomeAssistantBase {
     } else {
       this.serial = data.entity_id;
     }
-    this.client = client;
-    this.log = log;
 
     var speedList = data.attributes.speed_list;
     if (speedList) {
@@ -40,52 +37,24 @@ class HomeAssistantFan extends HomeAssistantBase {
     }
     this.tmallBotType = 'fan';
   }
-  onEvent(oldState, newState) {
-    this.fanService.getCharacteristic(Characteristic.On)
-      .setValue(newState.state === 'on', null, 'internal');
-  },
-  getPowerState(callback) {
-    this.client.fetchState(this.entity_id, (data) => {
-      if (data) {
-        const powerState = data.state === 'on';
-        callback(null, powerState);
-      } else {
-        callback(communicationError);
-      }
-    });
-  },
-  setPowerState(powerOn, callback, context) {
-    if (context === 'internal') {
-      callback();
-      return;
-    }
-
-    const that = this;
+  async getPowerState() {
+    const ret = await this.ha.fetchState(this.entity_id);
+    return ret.state === 'on';
+  }
+  async setPowerState(powerOn, callback, context) {
     const serviceData = {};
     serviceData.entity_id = this.entity_id;
 
     if (powerOn) {
-      this.log(`Setting power state on the '${this.name}' to on`);
+      debug(`Setting power state on the '${this.name}' to on`);
 
-      this.client.callService(this.domain, 'turn_on', serviceData, (data) => {
-        if (data) {
-          that.log(`Successfully set power state on the '${that.name}' to on`);
-          callback();
-        } else {
-          callback(communicationError);
-        }
-      });
+      const ret1 = await this.ha.callService(this.domain, 'turn_on', serviceData);
+      return ret1;
     } else {
-      this.log(`Setting power state on the '${this.name}' to off`);
+      debug(`Setting power state on the '${this.name}' to off`);
 
-      this.client.callService(this.domain, 'turn_off', serviceData, (data) => {
-        if (data) {
-          that.log(`Successfully set power state on the '${that.name}' to off`);
-          callback();
-        } else {
-          callback(communicationError);
-        }
-      });
+      const ret2 = await this.ha.callService(this.domain, 'turn_off', serviceData);
+      return ret2;
     }
   },
   getRotationSpeed(callback) {
@@ -178,32 +147,6 @@ class HomeAssistantFan extends HomeAssistantBase {
         }
       });
     }
-  },
-  getServices() {
-    this.fanService = new Service.Fan();
-    const informationService = new Service.AccessoryInformation();
-
-    informationService
-      .setCharacteristic(Characteristic.Manufacturer, this.mfg)
-      .setCharacteristic(Characteristic.Model, this.model)
-      .setCharacteristic(Characteristic.SerialNumber, this.serial);
-
-    this.fanService
-      .getCharacteristic(Characteristic.On)
-      .on('get', this.getPowerState.bind(this))
-      .on('set', this.setPowerState.bind(this));
-
-    this.fanService
-      .getCharacteristic(Characteristic.RotationSpeed)
-      .setProps({
-        minValue: 0,
-        maxValue: this.maxValue,
-        minStep: 1
-      })
-      .on('get', this.getRotationSpeed.bind(this))
-      .on('set', this.setRotationSpeed.bind(this));
-
-    return [informationService, this.fanService];
   },
   getTmallBotProperties() {},
 }

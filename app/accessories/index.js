@@ -13,6 +13,7 @@ const Switch = require('./switch');
 class Entity {
   constructor(data, ha) {
     this.data = data;
+    this.ha = ha;
     this.id = this.data.entity_id;
     this.deviceType = this.getDeviceType();
     this.deviceName = this.getDeviceName();
@@ -29,7 +30,7 @@ class Entity {
     };
     const cls = entityMap[_.upperFirst(_.camelCase(this.deviceType))];
     if (cls) {
-      return new cls();
+      return new cls(this.data, this.ha);
     }
     return null;
   }
