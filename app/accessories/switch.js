@@ -1,55 +1,19 @@
 'use strict';
 
-let Service;
-let Characteristic;
-let communicationError;
+const debug = require('debug')('ha:entity:switch');
+const HomeAssistantBase = require('./base');
 
-function HomeAssistantSwitch(log, data, client, type) {
-  // device info
-  this.domain = type || 'switch';
-  this.data = data;
-  this.entity_id = data.entity_id;
-  this.uuid_base = data.entity_id;
-  if (data.attributes && data.attributes.friendly_name) {
-    this.name = data.attributes.friendly_name;
-  } else {
-    this.name = data.entity_id.split('.').pop().replace(/_/g, ' ');
+class HomeAssistantSwitch extends HomeAssistantBase {
+  constructor(data, ha) {
+    super(data, ha);
+    this.domain = type || 'switch';
   }
-  if (data.attributes && data.attributes.homebridge_mfg) {
-    this.mfg = String(data.attributes.homebridge_mfg);
-  } else {
-    this.mfg = 'Home Assistant';
+  async turnOn() {
+    const callDomain = this.domain === 'group' ? 'homeassistant' : this.domain;
+    const serviceData = { entity_id: this.entity_id };
+    const data = await this.ha.callService(callDomain, 'turn_on', serviceData);
   }
-  if (data.attributes && data.attributes.homebridge_serial) {
-    this.serial = String(data.attributes.homebridge_serial);
-  } else {
-    this.serial = data.entity_id;
-  }
-  this.client = client;
-  this.log = log;
-}
-
-HomeAssistantSwitch.prototype = {
-  onEvent(oldState, newState) {
-    this.service.getCharacteristic(Characteristic.On)
-      .setValue(newState.state === 'on', null, 'internal');
-  },
-  getPowerState(callback) {
-    this.client.fetchState(this.entity_id, (data) => {
-      if (data) {
-        const powerState = data.state === 'on';
-        callback(null, powerState);
-      } else {
-        callback(communicationError);
-      }
-    });
-  },
-  setPowerState(powerOn, callback, context) {
-    if (context === 'internal') {
-      callback();
-      return;
-    }
-
+  async setPowerState(powerOn) {
     const that = this;
     const serviceData = {};
     serviceData.entity_id = this.entity_id;
@@ -84,7 +48,7 @@ HomeAssistantSwitch.prototype = {
         }
       });
     }
-  },
+  }
   getServices() {
     let model;
 
@@ -180,17 +144,7 @@ HomeAssistantSwitch.prototype = {
     }
 
     return [informationService, this.service];
-  },
-
-};
-
-function HomeAssistantSwitchPlatform(oService, oCharacteristic, oCommunicationError) {
-  Service = oService;
-  Characteristic = oCharacteristic;
-  communicationError = oCommunicationError;
-
-  return HomeAssistantSwitch;
+  }
 }
 
-module.exports = HomeAssistantSwitchPlatform;
-module.exports.HomeAssistantSwitch = HomeAssistantSwitch;
+module.exports = HomeAssistantSwitch;

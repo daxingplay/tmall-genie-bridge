@@ -56,7 +56,7 @@ class HomeAssistantFan extends HomeAssistantBase {
       const ret2 = await this.ha.callService(this.domain, 'turn_off', serviceData);
       return ret2;
     }
-  },
+  }
   getRotationSpeed(callback) {
     this.client.fetchState(this.entity_id, (data) => {
       if (data) {
@@ -89,7 +89,7 @@ class HomeAssistantFan extends HomeAssistantBase {
         callback(communicationError);
       }
     });
-  },
+  }
   setRotationSpeed(speed, callback, context) {
     if (context === 'internal') {
       callback();
@@ -147,8 +147,8 @@ class HomeAssistantFan extends HomeAssistantBase {
         }
       });
     }
-  },
-  getTmallBotProperties() {},
+  }
+  getTmallBotProperties() {}
 }
 
 module.exports = HomeAssistantFan;

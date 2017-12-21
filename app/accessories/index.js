@@ -79,6 +79,11 @@ class Entity {
       case 'TurnOff':
         ret = await this.inst.setPowerState(false);
         break;
+      case 'SelectChannel':
+        break;
+      case 'QueryWindSpeed':
+        ret = await this.inst.getRotationSpeed();
+        break;
       default:
         break;
     }
