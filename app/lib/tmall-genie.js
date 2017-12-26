@@ -82,7 +82,7 @@ class TmallGenie {
     const execActions = [];
     if (action === 'Query') {
       entity.allowedActions.forEach((act) => {
-        if (act.indexOf('Query') === 0 && act.substr(0, 5)) {
+        if (act.indexOf('Query') === 0 && act.substring(5)) {
           execActions.push(act);
         }
       });

@@ -44,9 +44,9 @@ class HomeAssistantBase {
     const data = await this.ha.callService(this.domain, 'turn_off', serviceData);
     return data;
   }
-  async query() {
-    const data = await this.ha.fetchState(this.entity_id);
-  }
+  // async query() {
+  //   const data = await this.ha.fetchState(this.entity_id);
+  // }
   async queryPowerState() {
     if (this.data.state) {
       return {

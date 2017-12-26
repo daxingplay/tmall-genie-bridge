@@ -9,6 +9,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const Fan = require('./fan');
 const Switch = require('./switch');
+const Group = require('./group');
 const tmallGenieConstants = require('../constants/tmall-genie');
 
 class Entity {
@@ -27,7 +28,7 @@ class Entity {
   }
   createInstance() {
     const entityMap = {
-      Fan, Switch
+      Fan, Switch, Group
     };
     const cls = entityMap[_.upperFirst(_.camelCase(this.deviceType))];
     if (cls) {

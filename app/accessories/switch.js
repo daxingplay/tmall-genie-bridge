@@ -7,9 +7,6 @@ class HomeAssistantSwitch extends HomeAssistantBase {
   constructor(data, ha) {
     super(data, ha);
     this.domain = this.deviceType || 'switch';
-    if (this.deviceType === 'group') {
-      this.domain = 'homeassistant';
-    }
   }
 }
 
