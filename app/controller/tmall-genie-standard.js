@@ -6,9 +6,10 @@
 const assert = require('assert');
 const TmallGenie = require('../lib/tmall-genie');
 
+
 const tmallGenieStandard = (fastify, options) => {
+  const tmallGenie = new TmallGenie(fastify);
   return async (request, reply) => {
-    const tmallGenie = new TmallGenie(fastify);
     const { header, payload } = request.body;
 
     assert(header, 'header not exists');

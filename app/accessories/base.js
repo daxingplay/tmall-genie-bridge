@@ -10,6 +10,8 @@ class HomeAssistantBase {
     this.ha = ha;
     this.entity_id = entity_id;
     this.uuid_base = entity_id;
+    this.deviceType = this.getDeviceType();
+    this.domain = this.deviceType;
     if (attributes && (attributes.tmall_bot_name || attributes.friendly_name)) {
       this.name = attributes.tmall_bot_name || attributes.friendly_name;
     } else {
@@ -26,13 +28,33 @@ class HomeAssistantBase {
       this.serial = entity_id;
     }
   }
-  async getPowerState() {
+  getDeviceType() {
+    return this.entity_id.split('.')[0];
+  }
+  getTmallBotProperties() {
+    return [];
+  }
+  async turnOn() {
+    const serviceData = { entity_id: this.entity_id };
+    const data = await this.ha.callService(this.domain, 'turn_on', serviceData);
+    return data;
+  }
+  async turnOff() {
+    const serviceData = { entity_id: this.entity_id };
+    const data = await this.ha.callService(this.domain, 'turn_off', serviceData);
+    return data;
+  }
+  async query() {
     const data = await this.ha.fetchState(this.entity_id);
-    if (data) {
-      return data.state;
-    } else {
-      throw new Error('SERVICE_ERROR');
+  }
+  async queryPowerState() {
+    if (this.data.state) {
+      return {
+        name: 'powerstate',
+        value: this.data.state,
+      };
     }
+    throw new Error('SERVICE_ERROR');
   }
 }
 

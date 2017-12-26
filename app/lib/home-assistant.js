@@ -83,7 +83,7 @@ class HomeAssistant {
     return this.invoke(`/api/services/${domain}/${service}`, 'post', payload);
   }
   async fetchState(entityId) {
-    return this.invoke(`/states/${entityId}`);
+    return this.invoke(`/api/states/${entityId}`);
   }
 }
 

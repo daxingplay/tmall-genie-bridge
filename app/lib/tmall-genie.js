@@ -16,12 +16,14 @@ class TmallGenie {
     this.devices = {};
   }
   wrapResponse(ret, headers) {
-    return {
+    const payload = _.isArray(ret) ? ret[0] : ret;
+    const others = _.isArray(ret) ? ret[1] : null;
+    return _.assign({
       header: _.assign({}, headers, {
         name: `${headers.name}Response`,
       }),
-      payload: ret,
-    };
+      payload,
+    }, others);
   }
   wrapErrorResponse(err, headers, payload) {
     return {
@@ -70,6 +72,30 @@ class TmallGenie {
       }, []),
     };
   }
+  async invokeQuery(headers, payload) {
+    const action = headers.name;
+    const entityId = payload.deviceId;
+
+    const entity = this.devices[entityId];
+    assert(entity, 'DEVICE_IS_NOT_EXIST');
+
+    const execActions = [];
+    if (action === 'Query') {
+      entity.allowedActions.forEach((act) => {
+        if (act.indexOf('Query') === 0 && act.substr(0, 5)) {
+          execActions.push(act);
+        }
+      });
+    } else {
+      execActions.push(action);
+    }
+    const args = _.pick(payload, ['attribute', 'value', 'extensions']);
+    const properties = await Promise.all(execActions.map(act => entity.invoke(act, args)));
+    return [
+      { deviceId: entity.id },
+      { properties }
+    ];
+  }
   async invokeControl(headers, payload) {
     const action = headers.name;
     const entityId = payload.deviceId;
@@ -80,7 +106,7 @@ class TmallGenie {
     const args = _.pick(payload, ['attribute', 'value', 'extensions']);
     const ret = await entity.invoke(action, args);
     return {
-      deviceId: entityId
+      deviceId: entityId,
     };
   }
 }

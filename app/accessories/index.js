@@ -9,6 +9,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const Fan = require('./fan');
 const Switch = require('./switch');
+const tmallGenieConstants = require('../constants/tmall-genie');
 
 class Entity {
   constructor(data, ha) {
@@ -35,12 +36,11 @@ class Entity {
     return null;
   }
   getAllowedActions() {
-    const funcMap = {
-      setPowerState: ['TurnOn', 'TurnOff'],
-    };
-    return _.reduce(funcMap, (allowedActions, mappedActions, func) => {
-      if (this.inst && _.isFunction(this.inst[func])) {
-        return allowedActions.concat(mappedActions);
+    const funcMap = tmallGenieConstants.control.concat(tmallGenieConstants.query);
+    return funcMap.reduce((allowedActions, func) => {
+      const f = _.camelCase(func);
+      if (this.inst && _.isFunction(this.inst[f])) {
+        return allowedActions.concat(func);
       }
       return allowedActions;
     }, []);
@@ -71,22 +71,9 @@ class Entity {
   async invoke(action, args) {
     assert(this.allowedActions.indexOf(action) > -1, 'DEVICE_NOT_SUPPORT_FUNCTION');
 
-    let ret;
-    switch (action) {
-      case 'TurnOn':
-        ret = await this.inst.setPowerState(true);
-        break;
-      case 'TurnOff':
-        ret = await this.inst.setPowerState(false);
-        break;
-      case 'SelectChannel':
-        break;
-      case 'QueryWindSpeed':
-        ret = await this.inst.getRotationSpeed();
-        break;
-      default:
-        break;
-    }
+    const func = _.camelCase(action);
+    const ret = await this.inst[func].call(this.inst, args);
+    return ret;
   }
 }
 
