@@ -11,24 +11,27 @@ class HomeAssistantSensor extends HomeAssistantBase {
     const unit = data.attributes.unit_of_measurement || '';
     this.sensorType = this.subId.split('_')[0];
     if (supportedSensorTypes.indexOf(this.sensorType) === -1) {
-      this.sensorType === undefined;
+      this.sensorType = undefined;
     }
-    if (this.subId.indexOf('battery') > -1) {
+    if (this.subId.indexOf('battery') > -1 && unit === '%') {
       this.sensorType = 'battery';
     } else if (unit.toUpperCase() === 'AQI') {
       this.sensorType = 'aqi';
     }
-    debug(`sensor type: ${this.sensorType}`);
+    debug(`${this.entity_id} sensor type: ${this.sensorType}`);
+    if (!this.sensorType) {
+      throw new Error('DEVICE_NOT_SUPPORT_FUNTION');
+    }
   }
 
-  async queryPowerState() {
+  queryPowerState() {
     return {
       name: 'powerstate',
       value: 'on',
     };
   }
 
-  async queryTemperature() {
+  queryTemperature() {
     if (this.sensorType === 'temperature') {
       return {
         name: 'temperature',
@@ -38,7 +41,7 @@ class HomeAssistantSensor extends HomeAssistantBase {
     return null;
   }
 
-  async queryHumidity() {
+  queryHumidity() {
     if (this.sensorType === 'humidity') {
       return {
         name: 'humidity',
@@ -48,7 +51,7 @@ class HomeAssistantSensor extends HomeAssistantBase {
     return null;
   }
 
-  async queryPM25() {
+  queryPM25() {
     if (this.sensorType === 'aqi') {
       return {
         name: 'pm2.5',

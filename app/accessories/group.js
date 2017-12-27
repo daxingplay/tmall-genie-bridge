@@ -6,9 +6,9 @@
 'use strict';
 
 const debug = require('debug')('ha:entity:group');
-const HomeAssistantBase = require('./base');
+const HomeAssistantSwitch = require('./switch');
 
-class HomeAssistantGroup extends HomeAssistantBase {
+class HomeAssistantGroup extends HomeAssistantSwitch {
   constructor(data, ha) {
     super(data, ha);
     this.domain = 'homeassistant';

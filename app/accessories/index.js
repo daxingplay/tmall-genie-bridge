@@ -6,11 +6,21 @@
 'use strict';
 
 const _ = require('lodash');
+const debug = require('debug')('ha:entity');
 const assert = require('assert');
 const Fan = require('./fan');
 const Switch = require('./switch');
 const Group = require('./group');
+const Sensor = require('./sensor');
 const tmallGenieConstants = require('../constants/tmall-genie');
+
+const entityMap = {
+  Fan,
+  Switch,
+  Group,
+  Sensor,
+  BinarySensor: Sensor,
+};
 
 class Entity {
   constructor(data, ha) {
@@ -27,24 +37,39 @@ class Entity {
     return tmall_bot_name || tmall_genie_name || friendly_name;
   }
   createInstance() {
-    const entityMap = {
-      Fan, Switch, Group
-    };
     const cls = entityMap[_.upperFirst(_.camelCase(this.deviceType))];
     if (cls) {
-      return new cls(this.data, this.ha);
+      try {
+        return new cls(this.data, this.ha);
+      } catch (e) {
+        debug(`unsupported device: ${this.id}`);
+        return null;
+      }
     }
     return null;
   }
   getAllowedActions() {
-    const funcMap = tmallGenieConstants.control.concat(tmallGenieConstants.query);
-    return funcMap.reduce((allowedActions, func) => {
-      const f = _.camelCase(func);
-      if (this.inst && _.isFunction(this.inst[f])) {
-        return allowedActions.concat(func);
+    if (this.inst) {
+      const allowedControls = tmallGenieConstants.control.reduce((allowedActions, func) => {
+        const f = _.camelCase(func);
+        if (_.isFunction(this.inst[f])) {
+          return allowedActions.concat(func);
+        }
+        return allowedActions;
+      }, []);
+      const allowedQueries = tmallGenieConstants.query.reduce((allowedActions, func) => {
+        const f = _.camelCase(func);
+        if (_.isFunction(this.inst[f]) && _.isObject(this.inst[f]())) {
+          return allowedActions.concat(func);
+        }
+        return allowedActions;
+      }, []);
+      if (allowedQueries.length) {
+        allowedQueries.unshift('Query');
       }
-      return allowedActions;
-    }, []);
+      return allowedControls.concat(allowedQueries);
+    }
+    return [];
   }
   getDeviceType() {
     return this.data.entity_id.split('.')[0];

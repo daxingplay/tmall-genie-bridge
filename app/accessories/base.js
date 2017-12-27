@@ -35,28 +35,9 @@ class HomeAssistantBase {
   getTmallBotProperties() {
     return [];
   }
-  async turnOn() {
-    const serviceData = { entity_id: this.entity_id };
-    const data = await this.ha.callService(this.domain, 'turn_on', serviceData);
-    return data;
-  }
-  async turnOff() {
-    const serviceData = { entity_id: this.entity_id };
-    const data = await this.ha.callService(this.domain, 'turn_off', serviceData);
-    return data;
-  }
   // async query() {
   //   const data = await this.ha.fetchState(this.entity_id);
   // }
-  async queryPowerState() {
-    if (this.data.state) {
-      return {
-        name: 'powerstate',
-        value: this.data.state,
-      };
-    }
-    throw new Error('SERVICE_ERROR');
-  }
 }
 
 module.exports = HomeAssistantBase;
