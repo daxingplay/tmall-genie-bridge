@@ -10,12 +10,13 @@ class HomeAssistantBase {
     this.ha = ha;
     this.entity_id = entity_id;
     this.uuid_base = entity_id;
+    this.subId = entity_id.split('.').pop();
     this.deviceType = this.getDeviceType();
     this.domain = this.deviceType;
     if (attributes && (attributes.tmall_bot_name || attributes.friendly_name)) {
       this.name = attributes.tmall_bot_name || attributes.friendly_name;
     } else {
-      this.name = data.entity_id.split('.').pop().replace(/_/g, ' ');
+      this.name = this.subId.replace(/_/g, ' ');
     }
     if (attributes && attributes.homebridge_mfg) {
       this.mfg = String(attributes.homebridge_mfg);

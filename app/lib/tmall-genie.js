@@ -93,7 +93,9 @@ class TmallGenie {
     const properties = await Promise.all(execActions.map(act => entity.invoke(act, args)));
     return [
       { deviceId: entity.id },
-      { properties }
+      {
+        properties: properties.filter(o => !!o),
+      }
     ];
   }
   async invokeControl(headers, payload) {
