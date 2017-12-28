@@ -22,6 +22,7 @@ class HomeAssistantClimate extends HomeAssistantBase {
     if (!this.model) {
       this.model = 'Climate';
     }
+    this.icon = 'https://img2.ojcdn.com/hass/icons/air-conditioner.png';
   }
   async turnOn() {
     const serviceData = {
@@ -39,7 +40,7 @@ class HomeAssistantClimate extends HomeAssistantBase {
     const data = await this.ha.callService(this.domain, 'set_operation_mode', serviceData);
     return data;
   }
-  async setTemperature(value) {
+  async setTemperature({ attribute, value }) {
     let temp = parseFloat(value);
     const { min_temp: minTemp, max_temp: maxTemp } = this.data.attributes;
     if (!_.isUndefined(minTemp) && temp < minTemp) {
@@ -62,7 +63,7 @@ class HomeAssistantClimate extends HomeAssistantBase {
     const curTemperature = this.data.attributes.temperature;
     return this.setTemperature(curTemperature - 0.5);
   }
-  async setWindSpeed(value) {
+  async setWindSpeed({ attribute, value }) {
     let fanMode = value;
     const fanModeList = this.data.attributes.fan_list || ['auto', 'low', 'medium', 'high'];
     if (fanModeList.indexOf(fanMode) === -1) {
@@ -79,27 +80,47 @@ class HomeAssistantClimate extends HomeAssistantBase {
     const data = await this.ha.callService(this.domain, 'set_fan_mode', serviceData);
     return data;
   }
+  async setMode({ attribute, value }) {
+    if (propertyMap.mode.values[value]) {
+      const serviceData = {
+        entity_id: this.entity_id,
+        operation_mode: value,
+      };
+      const data = await this.ha.callService(this.domain, 'set_operation_mode', serviceData);
+      return data;
+    }
+    throw new Error('DEVICE_NOT_SUPPORT_FUNCTION');
+  }
   queryTemperature() {
     const unit = getTempUnits(this.data);
     const temp = this.data.attributes.current_temperature || this.data.attributes.temperature;
+    let ret = temp;
     if (unit === 'FAHRENHEIT') {
-      return fahrenheitToCelsius(temp);
+      ret = fahrenheitToCelsius(temp);
     }
-    return temp;
+    return {
+      name: 'temperature',
+      value: ret,
+    };
   }
   queryMode() {
     const { mode } = this.data.attributes;
-    if (mode && propertyMap.mode[mode]) {
-      return {
-        name: 'mode',
-        value: mode,
-      };
+    if (mode) {
+      if (propertyMap.mode.values[mode] || mode === 'off') {
+        return {
+          name: 'mode',
+          value: mode,
+        };
+      }
     }
     return null;
   }
   queryPowerState() {
     const mode = this.queryMode();
-    return mode === 'off' ? 'off' : 'on';
+    return {
+      name: 'powerstate',
+      value: mode === 'off' ? 'off' : 'on',
+    };
   }
 }
 

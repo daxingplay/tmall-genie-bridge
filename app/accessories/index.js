@@ -12,6 +12,7 @@ const Fan = require('./fan');
 const Switch = require('./switch');
 const Group = require('./group');
 const Sensor = require('./sensor');
+const Climate = require('./climate');
 const tmallGenieConstants = require('../constants/tmall-genie');
 
 const entityMap = {
@@ -20,6 +21,7 @@ const entityMap = {
   Group,
   Sensor,
   BinarySensor: Sensor,
+  Climate,
 };
 
 class Entity {
@@ -83,7 +85,7 @@ class Entity {
         zone: '', // optional
         brand: this.inst.mfg || 'HomeAssistant',
         model: this.inst.model,
-        icon: '',
+        icon: this.inst.icon || '',
         properties: this.inst.getTmallBotProperties(),
         actions: this.allowedActions,
         // "extensions":{
